@@ -1,0 +1,20 @@
+# Every change is reviewed by a maintainer.
+* @innerluxesdev
+
+# The JSON reader, the reading of the file, the search for keys and seeds, the reader of the events, the times, the
+# identifiers and vocabularies, the decimals, the checks, the points of the standards, the rules and the output decide
+# every result and what is read from the disk; changes need extra care.
+/src/json.js @innerluxesdev
+/src/files.js @innerluxesdev
+/src/secrets.js @innerluxesdev
+/src/fields.js @innerluxesdev
+/src/events.js @innerluxesdev
+/src/time.js @innerluxesdev
+/src/gs1.js @innerluxesdev
+/src/decimal.js @innerluxesdev
+/src/analyze.js @innerluxesdev
+/src/data.js @innerluxesdev
+/src/rules.js @innerluxesdev
+/src/check.js @innerluxesdev
+/src/report.js @innerluxesdev
+/research/ @innerluxesdev
