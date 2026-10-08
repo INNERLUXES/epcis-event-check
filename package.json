@@ -1,0 +1,54 @@
+{
+  "name": "epcis-event-check",
+  "version": "1.0.0",
+  "description": "EPCIS event check: reads a file of GS1 EPCIS 2.0 events in JSON or JSON-LD (an EPCISDocument with its events in epcisBody.eventList, an EPCISQueryDocument, or a JSON list of events) before they are written to a shared supply chain ledger, contacts no ledger, node or API, fetches nothing, writes nothing to a ledger and reads no clock, and lists with its line every data mistake the checks know: an event type EPCIS does not have, a missing or malformed eventTime, recordTime or time zone offset, a missing or wrong action or an action on a TransformationEvent, an event that names no object, parent or business transaction, a TransformationEvent with no inputs or outputs, a quantity that is not positive or a count with no unit, no readPoint or bizLocation, no bizStep, a bizStep or disposition that is not in the CBV, an eventID written twice or not at all, events out of order or later than --now, an EPC seen after it was deleted, shipped from a place it never reached or put in two parents, EPC URIs whose digits do not add up and GTIN, SSCC and GLN check digits that are wrong. Not a certification of conformance. Text, markdown, JSON and SARIF output, exit codes for a pipeline, no dependencies.",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "bin": {
+    "epcis-event-check": "bin/epcis-event-check.js"
+  },
+  "files": [
+    "bin",
+    "src",
+    "docs",
+    "examples",
+    "research",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/*.test.js\"",
+    "test:coverage": "node --test --experimental-test-coverage \"test/*.test.js\"",
+    "check": "node tools/check.mjs",
+    "example": "node tools/example.mjs"
+  },
+  "keywords": [
+    "epcis",
+    "gs1",
+    "cbv",
+    "supply-chain",
+    "blockchain",
+    "traceability",
+    "gtin",
+    "sgtin",
+    "sscc",
+    "hyperledger-fabric",
+    "data-quality",
+    "static-analysis",
+    "sarif",
+    "cli"
+  ],
+  "author": "INNERLUXES <info@innerluxes.dev>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/INNERLUXES/epcis-event-check.git"
+  },
+  "homepage": "https://innerluxes.dev/blockchain/supply-chain"
+}
