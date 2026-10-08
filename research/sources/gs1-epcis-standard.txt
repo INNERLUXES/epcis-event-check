@@ -1,0 +1,340 @@
+Source: https://ref.gs1.org/standards/epcis/
+Read as the PDF the address returns (EPCIS Standard, Release 2.0, Ratified), fetched with curl and turned into text with pdftotext; only the parts the checks rest on are kept, each as it was read, with "[...]" where text was left out.
+
+EPCIS Standard
+
+enables disparate applications to create and share visibility event data, both within and across enterprises.
+
+[...]
+
+7.3.2
+
+Action type
+The Action type says how an event relates to the lifecycle of the entity being described. For example, AggregationEvent (section 7.4.3) is used to capture events related to aggregations of objects, such as cases aggregated to a pallet. Throughout its life, the pallet load participates in many business process steps, each of which may generate an EPCIS event. The action field of each event says how the aggregation itself has changed during the event: have objects been added to the aggregation, have objects been removed from the aggregation, or has the aggregation simply been observed without change to its membership? The action is independent of the bizStep (of type BusinessStepID) which identifies the specific business process step in which the action took place.
+
+The Action type is an enumerated type having three possible values:
+
+Action
+value
+
+Meaning
+
+ADD
+
+The entity in question has been created or added to.
+
+OBSERVE The entity in question has not been changed: it has neither been created, added to, destroyed, or removed from.
+
+DELETE
+
+The entity in question has been removed from or destroyed altogether.
+
+The description below for each event type that includes an Action value says more precisely what Action means in the context of that event.
+Note that the values above are the only values possible for Action. Unlike other types defined below, Action is not a vocabulary type, and SHALL NOT be extended by industry groups.
+
+[...]
+
+7.3.3.1
+
+QuantityElement
+A QuantityElement is a structure that identifies objects identified by a specific class-level identifier, either a specific quantity or an unspecified quantity. It has the following structure:
+
+Field
+
+Type
+
+Description
+
+epcClass EPCClass
+
+A class-level identifier for the class to which the specified quantity of objects belongs.
+
+quantity
+
+xsd:double
+
+(Optional) A number that specifies how many or how much of the specified EPCClass is denoted by this QuantityElement.
+The quantity may be omitted to indicate that the quantity is unknown or not specified. If quantity is omitted, then uom SHALL be
+omitted as well.
+Otherwise, if quantity is specified:
+If the QuantityElement lacks a uom field (below), then the quantity SHALL have a positive integer value, and denotes a count of the number of instances of the specified EPCClass that are denoted by this QuantityElement.
+If the QuantityElement includes a uom, then the quantity SHALL have a positive value (but not necessarily an integer value), and denotes the magnitude of the physical measure that specifies how much of the specified EPCClass is denoted by this QuantityElement
+
+uom
+
+[...]
+
+7.4.1
+
+EPCISEvent
+
+EPCISEvent is a common base type for all EPCIS events. All of the more specific event types in the following sections are subclasses of EPCISEvent.
+
+This common base type only has the following fields.
+
+Field
+
+Type
+
+Description
+
+eventTime
+
+xsd:dateTimeStamp
+
+The date and time at which the EPCIS Capturing Applications asserts the event occurred.
+
+Field
+recordTime eventTimeZoneOffset
+eventID
+errorDeclaration certificationInfo
+
+Type
+xsd:dateTimeStamp xsd:string
+EventID
+ErrorDeclaration gs1:CertificationDetails
+
+Description
+(Optional) The date and time at which this event was recorded by an EPCIS Repository. This field SHALL be ignored when an event is presented to the EPCIS Capture Interface, and SHALL be present
+when an event is retrieved through the EPCIS Query Interfaces. The recordTime does not
+describe anything about the real-world event, but is rather a bookkeeping mechanism that plays a role in the interpretation of standing queries as specified in section 8.2.5.2.
+The time zone offset in effect at the time and place the event occurred, expressed as an offset from
+UTC. The value of this field SHALL be a string consisting of the character '+' or the character '-', followed by two digits whose value is within the range 00 through 14 (inclusive), followed by a colon character ':', followed by two digits whose value is within the range 00 through 59 (inclusive), except that if the value of the first two digits is 14, the value of the second two digits must be 00.
+For example, the value +05:30 specifies that where the event occurred, local time was five hours
+and 30 minutes later than UTC (that is, midnight UTC was 5:30am local time).
+(Optional) An identifier for this event as specified by the capturing application, globally unique across all events other than error declarations. "Globally unique" means different from the
+eventID on any other EPCIS event across any implementation of EPCIS, not merely across the
+events captured by a single capturing application or by a single capture server. (The Core Business Vocabulary standard [CBV2.0] specifies the option of a UUID URI or NI Hash URI for this purpose.)
+Note that in the case of an error declaration, the event ID will be equal to the event ID of the erroneous event (or null if the event ID of the erroneous event is null), and in that sense is not unique. See section 7.4.1.2.
+(Optional) If present, indicates that this event serves to assert that the assertions made by a prior event are in error. See section 7.4.1.2.
+(Optional) If present, specifies a URL at which certification details can be found. Machineinterpretable certification details may be expressed using properties within the gs1:CertificationDetails class of the GS1 Web Vocabulary
+
+[...]
+
+ObjectEvent (subclass of EPCISEvent)
+An ObjectEvent captures information about an event pertaining to one or more physical or digital objects identified by instance-level (EPC) or class-level (EPC Class) identifiers. Most ObjectEvents are envisioned to represent actual observations of objects, but strictly speaking it can be used for any event a Capturing Application wants to assert about objects, including for example capturing the fact that an expected observation failed to occur.
+
+While more than one EPC and/or EPC Class may appear in an ObjectEvent, no relationship or association between those objects is implied other than the coincidence of having experienced identical events in the real world.
+
+The action field of an ObjectEvent describes the event's relationship to the lifecycle of the objects and their identifiers named in the event. Specifically:
+
+action value
+
+Meaning
+
+ADD
+
+The objects identified in the event have been commissioned as part of this event. For objects identified by EPCs (instance-level identifiers), the EPC(s) have been issued and associated with an object (s) for the first time. For objects identified by EPC Classes (class-level identifiers), the specified quantities of EPC Classes identified in the event have been created (though other instances of those same classes may have existed prior this event, and additional instances may be created subsequent to this event).
+
+OBSERVE The event represents a simple observation of the objects identified in the event, not their commissioning or decommissioning.
+
+DELETE
+
+The objects identified in the event have been decommissioned as part of this event. For objects identified by EPCs (instance-level identifiers), the EPC(s) do not exist subsequent to the event and SHOULD NOT be observed again. For objects identified by EPC Classes (class-level identifiers), the specified quantities of EPC Classes identified in the event have ceased to exist (though other instances of those same classes may continue to exist subsequent to this event, and additional instances may be have ceased to exist prior this event).
+
+An ObjectEvent has the following fields:
+
+Field
+
+Type
+
+Description
+
+eventTime recordTime eventTimeZoneOffset
+
+(Inherited from EPCISEvent; see section 7.4.1)
+
+epcList
+
+List<EPC>
+
+(Optional) An unordered list of one or more EPCs naming specific objects to which the event pertained. See section 7.3.3.2
+An ObjectEvent SHALL contain either a non-empty epcList, a nonempty quantityList, or both. The only permissible exception is if
+the object of observation is a physical location - in this case, the ObjectEvent SHALL contain a sensorElement and a non-empty readPoint populated with a physical location ID.
+
+quantityList
+
+List<QuantityElement>
+
+(Optional) An unordered list of one or more QuantityElements identifying (at the class level) objects to which the event pertained.
+An ObjectEvent SHALL contain either a non-empty epcList, a nonempty quantityList, or both. The only permissible exception is if
+the object of observation is a physical location - in this case, the ObjectEvent SHALL contain a sensorElement and a non-empty readPoint populated with a physical location ID.
+
+[...]
+
+AggregationEvent (subclass of EPCISEvent)
+The event type AggregationEvent describes events that apply to objects that have been aggregated to one another. In such an event, there is a set of "contained" objects that have been aggregated within a "containing" entity that's meant to identify the aggregation itself.
+
+This event type is intended to be used for "aggregations," in which there is a strong physical relationship between the containing and the contained objects such that they will all occupy the same location at the same time, until such time as they are disaggregated. An example of an aggregation is where cases are loaded onto a pallet and carried as a unit. The AggregationEvent type is not intended for weaker relationships such as two pallets that
+are part of the same shipment, but where the pallets might not always be in exactly the same place at the same time. (The TransactionEvent may be appropriate for such circumstances.) More specific semantics may be specified depending on the Business Step.
+
+The Action field of an AggregationEvent describes the event's relationship to the lifecycle of the aggregation. Specifically:
+
+Action value
+
+Meaning
+
+ADD
+
+The objects identified in the child list have been aggregated to the parent during this event. This includes situations where the aggregation is created for the first time, as well as when new children are added to an existing aggregate.
+
+OBSERVE
+
+The event represents neither adding nor removing children from the aggregation. The observation may be incomplete: there may be children that are part of
+the aggregation but not observed during this event and therefore not included in the childEPCs or childQuantityList field of the AggregationEvent; likewise, the parent identity may not be observed or known during this event and therefore the parentID field be omitted from the AggregationEvent.
+
+DELETE
+
+The objects identified in the child list have been disaggregated from the parent during this event. This includes situations where a subset of children are
+removed from the aggregation, as well as when the entire aggregation is dismantled. Both childEPCs and childQuantityList field may be omitted from the AggregationEvent, which means that all children have been disaggregated. (This permits disaggregation when the event capture software
+does not know the identities of all the children.)
+
+The AggregationEvent type includes fields that refer to a single "parent" (often a "containing" entity) and one or more "children" (often "contained" objects). A parent identifier is required when action is ADD or DELETE, but optional when action is OBSERVE.
+
+[...]
+
+URI List<EPC>
+List<QuantityElement>
+Action BusinessStepID DispositionID ReadPointID
+
+Description
+(Optional when action is OBSERVE, required otherwise) The identifier of the parent object of the aggregation. When the parent identifier is an EPC, this field SHALL contain the "pure identity" URI for the EPC as specified in [TDS].
+(Optional) An unordered list of the EPCs of contained objects identified by instance-level identifiers. See section 8.2 of the CBV. An AggregationEvent SHALL contain either a non-
+empty childEPCs, a non-empty childQuantityList, or both, except that both childEPCs and childQuantityList MAY be empty if action is DELETE, indicating
+that all children are disaggregated from the parent.
+(Optional) An unordered list of one or more QuantityElements identifying (at the class level) contained objects. See section 8.3 of the CBV. An AggregationEvent SHALL contain either a non-
+empty childEPCs, a non-empty childQuantityList, or both, except that both childEPCs and childQuantityList MAY be empty if action is DELETE, indicating
+that all children are disaggregated from the parent.
+
+[...]
+
+TransactionEvent (subclass of EPCISEvent)
+
+The event type TransactionEvent describes the association or disassociation of physical or digital objects to one or more business transactions. While other event types have an optional bizTransactionList field that may be used to provide context for an event, the TransactionEvent is used to declare in an unequivocal way that certain objects have been associated or disassociated with one or more business transactions as part of the event.
+
+The action field of a TransactionEvent describes the event's relationship to the lifecycle of the transaction. Specifically:
+
+[...]
+
+Field
+bizTransactionList parentID epcList
+quantityList
+
+Type Unordered list of one or more
+BusinessTransaction instances URI List<EPC>
+List<QuantityElement>
+
+Description
+The business transaction(s).
+(Optional) The identifier of the parent
+object of objects listed in epcList and quantityList, if these fields
+are present. When the parent identifier is an EPC, this field SHALL contain the "pure identity" URI for the EPC as specified in [TDS]. See also the note following the table.
+(Optional) An unordered list of the EPCs of the objects identified by instancelevel identifiers associated with the business transaction. See section 8.2 of the CBV. A TransactionEvent SHALL contain
+either a non-empty epcList, a nonempty quantityList, or both, except that both epcList and quantityList MAY be empty if action is DELETE, indicating that all
+the objects are disassociated from the business transaction(s).
+(Optional) An unordered list of one or more QuantityElements identifying objects (at the class level) to which the event pertained. A TransactionEvent SHALL contain
+either a non-empty epcList, a nonempty quantityList, or both, except that both epcList and quantityList MAY be empty if action is DELETE, indicating that all
+
+[...]
+
+TransformationEvent (subclass of EPCISEvent)
+
+A TransformationEvent captures information about an event in which one or more physical or digital objects identified by instance-level (EPC) or classlevel (EPC Class) identifiers are fully or partially consumed as inputs and one or more objects identified by instance-level (EPC) or class-level (EPC Class) identifiers are produced as outputs. The TransformationEvent captures the relationship between the inputs and the outputs, such that any of the inputs may have contributed in some way to each of the outputs.
+
+Some transformation business processes take place over a long period of time, and so it is more appropriate to represent them as a series of EPCIS events. A transformationID may be included in two or more TransformationEvents to link them together. When events share an identical transformationID, the meaning is that the inputs to any of those events may have contributed in some way to each of the outputs in any of those same events.
+
+Fields:
+
+Field
+
+Type
+
+Description
+
+eventTime recordTime eventTimeZoneOffset
+
+(Inherited from EPCISEvent; see section 7.4.1)
+
+inputEPCList
+
+List<EPC>
+
+(Optional) An unordered list of one or more EPCs identifying (at the instance level) objects that were inputs to the transformation..
+
+inputQuantityList
+
+List<QuantityElement>
+
+(Optional) An unordered list of one or more QuantityElements
+identifying (at the class level) objects that were inputs to the transformation.
+
+outputEPCList
+
+List<EPC>
+
+(Optional) An unordered list of one or more EPCs naming (at the instance level) objects that were outputs from the transformation.
+
+outputQuantityList
+
+List<QuantityElement>
+
+(Optional) An unordered list of one or more QuantityElements
+identifying (at the class level) objects that were outputs from the transformation.
+
+transformationID
+
+TransformationID
+
+(Optional) A unique identifier that links this event to other TransformationEvents having an identical value of
+transformationID. When specified, all inputs to all events
+sharing the same value of the transformationID may
+contribute to all outputs of all events sharing that value of
+transformationID. If transformationID is omitted, then
+the inputs of this event may contribute to the outputs of this event, but the inputs and outputs of other events are not connected to this one.
+
+bizStep
+
+BusinessStepID
+
+(Optional) The business step of which this event was a part.
+
+[...]
+
+Note that in the XML binding (section 9.3), sensorElementList appears in the standard extension area, to maintain backward-compatibility with EPCIS 1.2.
+If transformationID is omitted, then a TransformationEvent SHALL include at least one input (i.e., at least one of inputEPCList and inputQuantityList are non-empty) AND at least one output (i.e., at least one of outputEPCList and outputQuantityList are non-empty). If transformationID is included, then a TransformationEvent SHALL include at least one input OR at least one output (or both). The latter provides for the possibility that in a transformation described by several events linked by a common transformationID, any one event might only add inputs or extract outputs.
+Retrospective semantics:
+
+[...]
+
+AssociationEvent (subclass of EPCISEvent)
+The event type AssociationEvent describes the association or disassociation of one or several physical objects with a parent object or a specific physical location.
+Like the AggregationEvent, the AssociationEvent is also used to capture associations where there is a strong physical relationship between the containing and the contained objects such that they will all occupy the same location at the same time, until such time as they are disaggregated. However, the AggregationEvent does not allow for associations of objects with physical locations; if action is DELETE while omitting the childEPC and childQuantityList field, all contained children are disaggregated from the containing parent.
+
+[...]
+
+The objects identified in the child list have been disassociated from the parent during this event. This includes situations where a subset of children are
+removed from the association, as well as when the entire association is dismantled. Both childEPCs and childQuantityList field may be omitted from the AssociationEvent, which means that all children have been disassociated. (This permits disassociation when the event capture software does
+not know the identities of all the children.)
+
+The AssociationEvent type includes fields that refer to a single "parent" (often a "containing" entity) and one or more "children" (often "contained" objects). A parent identifier is required when action is ADD or DELETE, but optional when action is OBSERVE.
+
+Non-Normative: Explanation: A parent identifier is used when action is ADD so that there is a way of referring to the association in subsequent events when action is DELETE. The parent identifier is optional when action is OBSERVE because the parent is not always known during an intermediate observation.
+
+[...]
+
+URI
+
+The identifier of the parent object or parent location of the association. When the parent identifier is an EPC, this field SHALL contain the "pure identity" URI for the EPC as specified in [TDS].
+
+childEPCs
+
+List<EPC>
+
+(Optional) An unordered list of the EPCs of contained objects identified by instance-level identifiers.
+An AssociationEvent SHALL contain either a non-empty childEPCs, a non-empty childQuantityList, or both, except that both childEPCs and childQuantityList MAY be empty if action is DELETE, indicating that all children are disassociated from the parent.
+
+[...]
+
+epcis:EventTimeShape a sh:PropertyShape ; sh:path epcis:eventTime ; sh:name "eventTime" ; sh:datatype xsd:dateTimeStamp ; sh:minCount 1 ; sh:maxCount 1 ; sh:message "In all EPCIS events, eventTime is mandatory, single valued and an xsd:dateTimeStamp" ;
+
+Because eventTime is a mandatory field in all EPCIS events, it must occur exactly once. For XSD, the default values of both attributes minOccurs and maxOccurs is 1, so they are typically omitted from XSD validation rules unless they specify other values such as minOccurs="0" for an optional field or maxOccurs="unbounded" if there is no upper limit on the number of permitted values. In JSON Schema, a mandatory field is listed within the list of "required" fields. In SHACL, a mandatory field is indicated via a constraint of sh:minCount 1. In XSD, the type attribute expresses the data type, e.g. type="xsd:dateTimeStamp". In JSON Schema, the property for eventTime references a definition for a datatype called time, in which the "type" is required to be "string" and the "format" is required to be "date-time". In SHACL, the constraint sh:datatype specifies that an xsd:dateTimeStamp value is expected.

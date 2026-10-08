@@ -1,0 +1,222 @@
+epcis-event-check: examples/bad/events.json
+file: examples/bad/events.json (JSON, 184 lines, 7,840 bytes)
+document: EPCISDocument, schema version 2.0, created 2101-03-10T12:00:00.000Z
+events: 17 (11 ObjectEvent, 3 AggregationEvent, 1 TransactionEvent, 1 TransformationEvent and 1 of another or no type)
+identifiers: 10 EPCs, 1 class and 4 places
+event times: from 2101-03-01T08:00:00.000+01:00 to 2101-03-20T08:00:00.000+01:00
+now: 2101-03-10T12:00:00Z, from --now
+findings: 32 (21 error, 10 warning, 1 info)
+
+Checks (32)
+
+  check                                level    kind           findings
+  file-unreadable                      error    input          0
+  field-missing                        error    input          1
+  field-unknown                        warning  input          1
+  field-invalid                        error    input          1
+  field-duplicate                      error    input          1
+  secret-in-file                       error    input          1
+  event-type-unknown                   error    documented     1
+  event-time-missing                   error    documented     1
+  event-time-invalid                   error    documented     1
+  timezone-offset-missing              error    documented     1
+  timezone-offset-invalid              error    documented     1
+  action-missing                       error    documented     1
+  action-invalid                       error    documented     1
+  transformation-with-action           error    documented     1
+  what-missing                         error    documented     1
+  transformation-inputs-outputs-empty  error    documented     1
+  quantity-invalid                     error    documented     1
+  where-missing                        warning  best practice  1
+  why-missing                          warning  documented     1
+  biz-step-unknown                     warning  documented     2
+  disposition-unknown                  warning  documented     1
+  event-id-duplicate                   error    documented     1
+  event-id-missing                     info     best practice  1
+  event-out-of-order                   warning  best practice  1
+  future-event                         error    best practice  1
+  object-after-delete                  warning  documented     1
+  shipped-before-received              warning  best practice  1
+  aggregation-child-in-two-parents     warning  best practice  1
+  epc-uri-malformed                    error    documented     1
+  gtin-check-digit-invalid             error    documented     1
+  sscc-check-digit-invalid             error    documented     1
+  gln-check-digit-invalid              error    documented     1
+
+Findings (32)
+
+  ERROR    secret-in-file                       examples/bad/events.json:7
+           The file holds the key "mnemonic", which names a seed, a mnemonic or a private key. The tool never reads one, and the value is not shown.
+           fix: Remove the value from the file and from wherever the file was copied, treat it as exposed and move what it controls to a new key. An event names objects, places and transactions, never the key of a ledger account.
+
+  ERROR    field-duplicate                      examples/bad/events.json:15
+           The epcList of event 1 (ObjectEvent) lists urn:epc:id:sgtin:9521234.012345.1001 twice, on line 15; an EPC is listed once.
+           fix: List each EPC once in each list.
+
+  ERROR    event-type-unknown                   examples/bad/events.json:22
+           Event 2 has the type "Object", which is not one of the five event types of EPCIS 2.0 (ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent and AssociationEvent), so its fields were not checked against a type. Did you mean ObjectEvent? The type of an extension is a URI.
+           fix: Write ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent or AssociationEvent, with that spelling and case.
+           basis: EPCIS 2.0 defines five kinds of event, each a subclass of the common EPCISEvent: ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent and AssociationEvent. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: In the JSON schema of EPCIS 2.0 the type of an event is one of the five event names, or else a URI that names an event type of an extension. (EPCIS 2.0 JSON schema, repository gs1/EPCIS, https://github.com/gs1/EPCIS/tree/master/JSON-Schema)
+
+  ERROR    event-time-missing                   examples/bad/events.json:31
+           Event 3 (ObjectEvent) has no eventTime; EPCIS calls eventTime mandatory in every event, so no one can tell when it took place.
+           fix: Add the eventTime: the date, time and time zone at which the event took place.
+           basis: EPCIS calls eventTime a mandatory field of every event, to be written exactly once. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    event-time-invalid                   examples/bad/events.json:43
+           The eventTime of event 4 (ObjectEvent), "2101-03-01T08:20:00", has no time zone, so the moment it names is not known; end it with Z or an offset such as +01:00. EPCIS types it as xsd:dateTimeStamp, a date and time with its time zone.
+           fix: Write the time as YYYY-MM-DDThh:mm:ss, with an optional fraction of a second, and end it with Z or an offset such as +01:00.
+           basis: EPCIS types eventTime and recordTime as xsd:dateTimeStamp, a date and time that carries its own time zone, so the moment of an event is never left open. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    timezone-offset-invalid              examples/bad/events.json:44
+           The eventTimeZoneOffset of event 4 (ObjectEvent), "+14:30", has 14 hours with minutes other than 00; EPCIS writes it as a sign, two digits of hours from 00 to 14, a colon and two digits of minutes.
+           fix: Write the offset as +hh:mm or -hh:mm, such as +05:30 or -08:00; write Z as +00:00.
+           basis: EPCIS writes eventTimeZoneOffset as a plus or minus sign, two digits of hours from 00 to 14, a colon and two digits of minutes from 00 to 59, and allows only 00 minutes with 14 hours. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    action-invalid                       examples/bad/events.json:46
+           The action of event 4 (ObjectEvent) is "add"; write it in capitals, ADD. EPCIS allows only ADD, OBSERVE and DELETE, and no group may add another.
+           fix: Write ADD, OBSERVE or DELETE, in capitals; EPCIS allows no other value.
+           basis: The Action type of EPCIS has exactly three values, ADD, OBSERVE and DELETE, and EPCIS says that industry groups may not extend it. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    action-missing                       examples/bad/events.json:50
+           Event 5 (AggregationEvent) has no action; the JSON schema of AggregationEvent requires one, ADD, OBSERVE or DELETE, to say how the event changes what it names.
+           fix: Add the action: ADD when the objects or the link are created, OBSERVE when they are seen unchanged, DELETE when they end.
+           basis: The JSON schemas of ObjectEvent, AggregationEvent, TransactionEvent and AssociationEvent each list action as a required field. (EPCIS 2.0 JSON schema, repository gs1/EPCIS, https://github.com/gs1/EPCIS/tree/master/JSON-Schema)
+
+  ERROR    timezone-offset-missing              examples/bad/events.json:50
+           Event 5 (AggregationEvent) has no eventTimeZoneOffset, which the JSON schema of EPCIS 2.0 requires next to the eventTime: the offset from UTC in effect where the event took place.
+           fix: Add the eventTimeZoneOffset in effect where the event took place, such as +01:00, even when the eventTime is written in UTC.
+           basis: The JSON schema of EPCIS 2.0 lists eventTimeZoneOffset next to eventTime as the two required fields of the common event. (EPCIS 2.0 JSON schema, repository gs1/EPCIS, https://github.com/gs1/EPCIS/tree/master/JSON-Schema)
+
+  ERROR    transformation-with-action           examples/bad/events.json:86
+           Event 8 (TransformationEvent) has an action (ADD), but the fields EPCIS gives a TransformationEvent hold no action, and its JSON schema does not allow one.
+           fix: Remove the action; a TransformationEvent says what was used and what was made through its inputs and outputs.
+           basis: The table of fields EPCIS gives a TransformationEvent has no action, though the tables of the other four event types have one. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: The JSON schema of a TransformationEvent lists the keys such an event may hold, and action is not among them. (EPCIS 2.0 JSON schema, repository gs1/EPCIS, https://github.com/gs1/EPCIS/tree/master/JSON-Schema)
+
+  ERROR    transformation-inputs-outputs-empty  examples/bad/events.json:87
+           Event 8 (TransformationEvent) has no output and no transformationID; EPCIS asks such a TransformationEvent for at least one input and one output.
+           fix: List what was used in inputEPCList or inputQuantityList and what was made in outputEPCList or outputQuantityList, or link events of one process with a transformationID.
+           basis: Without a transformationID a TransformationEvent needs at least one input and at least one output; with one, it needs at least one input or one output. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    quantity-invalid                     examples/bad/events.json:87
+           The quantity of item 1 of the inputQuantityList of event 8 (TransformationEvent) is 2.5 with no uom; EPCIS reads a quantity with no unit of measure as a count, which must be a positive whole number. Add the uom of the measure, such as KGM.
+           fix: Write a count of objects as a positive whole number with no uom, or a measure as a positive number with its UN/CEFACT code, such as KGM; leave the uom out when the quantity is unknown.
+           basis: A quantity with no unit of measure must be a positive whole number, a quantity with a unit must be positive, and a unit of measure is left out when the quantity is. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    field-invalid                        examples/bad/events.json:97
+           The quantity of item 1 of the quantityList of event 9 (ObjectEvent) is "5"; it must be a JSON number.
+           fix: Write the value as docs/inputs.md shows: text for times, identifiers and vocabulary values, lists for the lists of EPCs and quantities, objects for locations, and JSON numbers for quantities.
+
+  ERROR    event-id-duplicate                   examples/bad/events.json:104
+           The eventID of event 10 (ObjectEvent), urn:uuid:00000000-0000-4000-8000-000000000009, is also the eventID of event 9 at line 93; EPCIS asks for an eventID unique across all events but error declarations.
+           fix: Give every event an eventID of its own, such as a UUID URI; an error declaration keeps the eventID of the event it corrects.
+           basis: EPCIS asks that an eventID be unique across all events, with the one exception of an error declaration, which repeats the eventID of the event it corrects. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  ERROR    field-missing                        examples/bad/events.json:110
+           The readPoint of event 10 (ObjectEvent) has no id.
+           fix: Add the field named; docs/inputs.md lists what each part of the file needs.
+
+  ERROR    epc-uri-malformed                    examples/bad/events.json:158
+           An EPC of the epcList of event 15 (ObjectEvent), urn:epc:id:sgtin:9521234.01234.1, is an SGTIN URI that has 12 digits in its company prefix and an indicator and item reference, not 13.
+           fix: Write the EPC as the Tag Data Standard does: urn:epc:id:sgtin: with 13 digits before the serial, urn:epc:id:sscc: with 17 digits, urn:epc:id:sgln: with 12 digits before the extension.
+           basis: The Tag Data Standard writes an SGTIN as a company prefix and an item reference of 13 digits in all, an SSCC as 17 digits in all and an SGLN as 12, each followed where it applies by a serial or an extension. (EPC Tag Data Standard (TDS), GS1, https://ref.gs1.org/standards/tds/)
+
+  ERROR    gtin-check-digit-invalid             examples/bad/events.json:158
+           The GTIN 09521234123457 in an EPC of the epcList of event 15 (ObjectEvent) ends with 7, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place.
+           fix: Work the check digit out again from the other digits, or copy the GTIN again from its source.
+           basis: The GS1 General Specifications give one check digit rule for GTIN, GLN and SSCC: weight the digits 3 and 1 from the right, add them up, and take what is missing to the next multiple of ten. (GS1 General Specifications Standard, https://ref.gs1.org/standards/genspecs/)
+           basis: The Tag Data Standard leaves the check digit of the GTIN out of an SGTIN and works it out from the other 13 digits when the GTIN is needed again. (EPC Tag Data Standard (TDS), GS1, https://ref.gs1.org/standards/tds/)
+
+  ERROR    sscc-check-digit-invalid             examples/bad/events.json:158
+           The SSCC 095212340000000010 in an EPC of the epcList of event 15 (ObjectEvent) ends with 0, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place.
+           fix: Work the check digit out again from the first 17 digits, or copy the SSCC again from the label.
+           basis: The GS1 General Specifications give one check digit rule for GTIN, GLN and SSCC: weight the digits 3 and 1 from the right, add them up, and take what is missing to the next multiple of ten. (GS1 General Specifications Standard, https://ref.gs1.org/standards/genspecs/)
+
+  ERROR    gln-check-digit-invalid              examples/bad/events.json:161
+           The GLN 9521234000019 in the id of the readPoint of event 15 (ObjectEvent) ends with 9, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place.
+           fix: Work the check digit out again from the first 12 digits, or copy the GLN again from the master data of the location.
+           basis: The GS1 General Specifications give one check digit rule for GTIN, GLN and SSCC: weight the digits 3 and 1 from the right, add them up, and take what is missing to the next multiple of ten. (GS1 General Specifications Standard, https://ref.gs1.org/standards/genspecs/)
+
+  ERROR    future-event                         examples/bad/events.json:166
+           The eventTime of event 16 (ObjectEvent), 2101-03-20T08:00:00.000+01:00, is 846,000 seconds (more than 9 days) after the moment given with --now, 2101-03-10T12:00:00Z, so it names a time that has not come. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Correct the clock or the time zone of the system that wrote the event; an event cannot take place after it is reported.
+           the tool's own choice: refusing an event from the future is a best practice of this tool, not a rule in the standards it cites; EPCIS sets no rule about it, and the tool reads no clock, so the moment is the one given with --now
+
+  ERROR    what-missing                         examples/bad/events.json:172
+           Event 17 (TransactionEvent) names no business transaction; a TransactionEvent exists to tie objects to one, so EPCIS asks for its bizTransactionList.
+           fix: Name the objects in the lists of the event type, the parent of an aggregation or association that is added or removed, and the business transaction of a TransactionEvent.
+           basis: An ObjectEvent must name its objects in a non-empty epcList or quantityList; the one exception is a sensor reading of a physical location named in the readPoint. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: An AggregationEvent or an AssociationEvent must hold a non-empty childEPCs or childQuantityList, unless its action is DELETE and it removes every child. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: An AggregationEvent or an AssociationEvent needs a parentID when its action is ADD or DELETE; only an OBSERVE may leave the parent out. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: A TransactionEvent names one or more business transactions, and must hold a non-empty epcList or quantityList unless its action is DELETE. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+
+  WARNING  field-unknown                        examples/bad/events.json:19
+           The key "bizLocaton" of event 1 (ObjectEvent) is not one the tool reads there, so its value was left out of every check. Did you mean "bizLocation"? The keys of event 1 (ObjectEvent) are @context, type, eventTime, recordTime, eventTimeZoneOffset, eventID, certificationInfo, errorDeclaration, action, epcList, quantityList, bizStep, disposition, persistentDisposition, readPoint, bizLocation, bizTransactionList, sourceList, destinationList, sensorElementList, ilmd; a key of an extension holds a colon.
+           fix: Correct the spelling to a field of docs/inputs.md, move the field to the event type it belongs to, or name an extension field with a prefix such as example:field.
+
+  WARNING  biz-step-unknown                     examples/bad/events.json:47
+           The bizStep of event 4 (ObjectEvent), "Commissioning", is not a business step of the CBV; the CBV writes commissioning in lower case with underscores. A step of your own is a URI of your own domain.
+           fix: Use a value of the CBV table, in lower case with underscores, such as shipping; name a step of your own with a URI of your own domain.
+           basis: A bizStep of the CBV is one of the words of its table of business steps, written in lower case with underscores, alone in JSON or after the prefix urn:epcglobal:cbv:bizstep: or its web form; any other value is a URI of its own. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+
+  WARNING  aggregation-child-in-two-parents     examples/bad/events.json:76
+           Event 7 (AggregationEvent) adds urn:epc:id:sgtin:9521234.012345.1001 in the parent urn:epc:id:sscc:9521234.0000000003, but event 6 put it in urn:epc:id:sscc:9521234.0000000002 and no event took it out. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Add the AggregationEvent with action DELETE that took the child out of its first parent, or correct the parent of the later event.
+           the tool's own choice: following the aggregations of a child is a best practice of this tool, not a rule in the standards it cites; EPCIS describes each AggregationEvent on its own, and a file may not hold the event that took the child out
+
+  WARNING  why-missing                          examples/bad/events.json:102
+           Event 10 (ObjectEvent) has no bizStep; the CBV says that every event should carry one, so the business step it was part of is not known.
+           fix: Add the bizStep of the business process, such as shipping, receiving or commissioning.
+           basis: The CBV says that every event of a document that conforms to it should carry a bizStep. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+
+  WARNING  disposition-unknown                  examples/bad/events.json:109
+           The disposition of event 10 (ObjectEvent), "non_sellable_expired", is a value the CBV deprecates; use expired.
+           fix: Use a value of the CBV table, such as in_transit or sellable_accessible, or the value that replaces a deprecated one.
+           basis: A disposition of the CBV is one of the words of its table of dispositions, written in lower case with underscores, alone in JSON or after the prefix urn:epcglobal:cbv:disp: or its web form. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+           basis: The CBV marks the dispositions that start with non_sellable and the value no_pedigree_match as deprecated, and names the value that replaces each where there is one. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+
+  WARNING  object-after-delete                  examples/bad/events.json:126
+           Event 12 (ObjectEvent) names urn:epc:id:sgtin:9521234.012345.1003, 3,600 seconds (1 hour) after event 11 ended it with an ObjectEvent with action DELETE, after which EPCIS says the EPC should not be seen again.
+           fix: Check whether the later event read the wrong tag or the delete was a mistake; correct the wrong event with an error declaration rather than a new event.
+           basis: After an ObjectEvent with action DELETE the identifiers it names no longer exist, and EPCIS says they should not be seen in later events. (EPCIS Standard, Release 2.0, GS1, https://ref.gs1.org/standards/epcis/)
+           basis: The CBV says that an object whose identifier was destroyed should not appear in later events, and that a later event about it most likely marks a mistake. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+
+  WARNING  biz-step-unknown                     examples/bad/events.json:128
+           The bizStep of event 12 (ObjectEvent), "urn:epcglobal:cbv:bizstep:shipped", is not a business step of the CBV. A step of your own is a URI of your own domain.
+           fix: Use a value of the CBV table, in lower case with underscores, such as shipping; name a step of your own with a URI of your own domain.
+           basis: A bizStep of the CBV is one of the words of its table of business steps, written in lower case with underscores, alone in JSON or after the prefix urn:epcglobal:cbv:bizstep: or its web form; any other value is a URI of its own. (Core Business Vocabulary (CBV) Standard, Release 2.0, GS1, https://ref.gs1.org/standards/cbv/)
+
+  WARNING  shipped-before-received              examples/bad/events.json:147
+           Event 14 (ObjectEvent) ships urn:epc:id:sscc:9521234.0000000002 from urn:epc:id:sgln:9521234.00003.0, but its earlier events place it elsewhere, last at urn:epc:id:sgln:9521234.00002.0 in event 13, and never there. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Check the readPoint and source of the shipping event and whether an event of the arrival is missing or out of place.
+           the tool's own choice: following an EPC from place to place is a best practice of this tool, not a rule in the standards it cites; EPCIS says what each event means but sets no rule across events, and a file may hold only part of the history of an object
+
+  WARNING  event-out-of-order                   examples/bad/events.json:155
+           The recordTime of event 15 (ObjectEvent), 2101-03-04T07:00:00.000+01:00, is 3,600 seconds (1 hour) before its eventTime, 2101-03-04T08:00:00.000+01:00, though an event is recorded after it takes place. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Check the clocks of the readers and the order the events were captured in; list the events of an object in the order they took place.
+           the tool's own choice: comparing the times this way is a best practice of this tool, not a rule in the standards it cites; EPCIS does not ask for events in time order, but a ledger that keeps them in the order they arrive shows the history of an object out of order
+
+  WARNING  where-missing                        examples/bad/events.json:163
+           Event 16 (ObjectEvent) has neither a readPoint nor a bizLocation, so no one can tell where it took place. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Add the readPoint where the event was seen, and the bizLocation where the objects are afterwards when they stay there.
+           the tool's own choice: asking for a readPoint or a bizLocation is a best practice of this tool, not a rule in the standards it cites; EPCIS makes both optional, but an event with neither cannot be placed on a map of the chain
+
+  INFO     event-id-missing                     examples/bad/events.json:112
+           Event 11 (ObjectEvent) has no eventID, so a ledger cannot tell it apart from the same event sent again. This is a best practice of this tool, not a rule in the standards it cites.
+           fix: Give each event an eventID, such as a UUID URI or the hash ID of the CBV, when the events go to a ledger.
+           the tool's own choice: asking for an eventID is a best practice of this tool, not a rule in the standards it cites; EPCIS makes it optional, but a shared ledger needs it to keep an event that is sent again from being written twice, so it is a note
+
+Event types (5)
+
+  type                 events  ADD  OBSERVE  DELETE  no action
+  ObjectEvent          11      2    7        1       1
+  AggregationEvent     3       2    0        0       1
+  TransactionEvent     1       1    0        0       0
+  TransformationEvent  1       1    0        0       0
+  other                1       1    0        0       0
+
+This report is an input to a review of EPCIS events before they are written to a shared supply chain ledger: not a certification of conformance to EPCIS or the CBV, not an audit of the supply chain and not a guarantee that the events describe what really happened.
+
+RESULT: FAIL - 21 findings at or above error (21 error, 10 warning, 1 info)

@@ -1,0 +1,111 @@
+{
+  "@context": ["https://ref.gs1.org/standards/epcis/epcis-context.jsonld", { "example": "https://example.com/epcis/" }],
+  "type": "EPCISDocument",
+  "schemaVersion": "2.0",
+  "creationDate": "2101-03-10T12:00:00.000Z",
+  "example:note": "Made-up EPCIS document for the examples of epcis-event-check. The GS1 Company Prefix 9521234 starts with 952, the GS1 Prefix the GS1 General Specifications keep for demonstrations and examples, and every time is in a made-up year. It is not a certification of anything.",
+  "epcisBody": {
+    "eventList": [
+      {
+        "type": "ObjectEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000001",
+        "eventTime": "2101-03-01T08:00:00.000+01:00",
+        "recordTime": "2101-03-01T08:00:05.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "epcList": ["urn:epc:id:sgtin:9521234.012345.1001", "urn:epc:id:sgtin:9521234.012345.1002"],
+        "action": "ADD",
+        "bizStep": "commissioning",
+        "disposition": "active",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00001.0" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00001.0" }
+      },
+      {
+        "type": "AggregationEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000002",
+        "eventTime": "2101-03-01T09:00:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "parentID": "urn:epc:id:sscc:9521234.0000000001",
+        "childEPCs": ["urn:epc:id:sgtin:9521234.012345.1001", "urn:epc:id:sgtin:9521234.012345.1002"],
+        "action": "ADD",
+        "bizStep": "packing",
+        "disposition": "in_progress",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00001.0" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00001.0" }
+      },
+      {
+        "type": "ObjectEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000003",
+        "eventTime": "2101-03-02T07:30:00.000Z",
+        "eventTimeZoneOffset": "+01:00",
+        "epcList": ["urn:epc:id:sscc:9521234.0000000001"],
+        "action": "OBSERVE",
+        "bizStep": "shipping",
+        "disposition": "in_transit",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00001.1" },
+        "sourceList": [{ "type": "location", "source": "urn:epc:id:sgln:9521234.00001.0" }],
+        "destinationList": [{ "type": "location", "destination": "urn:epc:id:sgln:9521234.00002.0" }]
+      },
+      {
+        "type": "ObjectEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000004",
+        "eventTime": "2101-03-03T14:15:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "epcList": ["urn:epc:id:sscc:9521234.0000000001"],
+        "action": "OBSERVE",
+        "bizStep": "receiving",
+        "disposition": "in_progress",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00002.0" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00002.0" }
+      },
+      {
+        "type": "AggregationEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000005",
+        "eventTime": "2101-03-03T15:00:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "parentID": "urn:epc:id:sscc:9521234.0000000001",
+        "childEPCs": ["urn:epc:id:sgtin:9521234.012345.1001", "urn:epc:id:sgtin:9521234.012345.1002"],
+        "action": "DELETE",
+        "bizStep": "unpacking",
+        "disposition": "sellable_not_accessible",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00002.0" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00002.0" }
+      },
+      {
+        "type": "TransactionEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000006",
+        "eventTime": "2101-03-03T15:30:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "bizTransactionList": [{ "type": "po", "bizTransaction": "urn:epcglobal:cbv:bt:9521234000020:PO-77" }],
+        "epcList": ["https://id.gs1.org/01/09521234123453/21/1001"],
+        "action": "ADD",
+        "bizStep": "accepting",
+        "readPoint": { "id": "https://id.gs1.org/414/9521234000020" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00002.0" }
+      },
+      {
+        "type": "TransformationEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000007",
+        "eventTime": "2101-03-04T10:00:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "inputQuantityList": [{ "epcClass": "urn:epc:class:lgtin:9521234.012346.L1", "quantity": 25.5, "uom": "KGM" }],
+        "outputEPCList": ["urn:epc:id:sgtin:9521234.012347.5001"],
+        "outputQuantityList": [{ "epcClass": "urn:epc:idpat:sgtin:9521234.012347.*", "quantity": 12 }],
+        "bizStep": "commissioning",
+        "disposition": "active",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00002.0" },
+        "bizLocation": { "id": "urn:epc:id:sgln:9521234.00002.0" }
+      },
+      {
+        "type": "AssociationEvent",
+        "eventID": "urn:uuid:00000000-0000-4000-8000-000000000008",
+        "eventTime": "2101-03-04T11:00:00.000+01:00",
+        "eventTimeZoneOffset": "+01:00",
+        "parentID": "urn:epc:id:sgln:9521234.00002.7",
+        "childEPCs": ["urn:epc:id:sgtin:9521234.012345.1002"],
+        "action": "ADD",
+        "bizStep": "installing",
+        "readPoint": { "id": "urn:epc:id:sgln:9521234.00002.0" }
+      }
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+Source: https://ref.gs1.org/standards/tds/
+Read as the PDF the address returns (EPC Tag Data Standard, Release 2.3, Ratified), fetched with curl and turned into text with pdftotext; only the parts the checks rest on are kept, each as it was read, with "[...]" where text was left out.
+
+EPC Tag Data Standard TDS
+
+defines the Electronic Product Code(TM) and specifies the memory contents of Gen 2 RFID Tags
+
+[...]
+
+5 Common grammar elements
+The syntax of various URI forms defined herein is specified via ABNF grammar defined in [RFC5234] and [RFC7405]. The following grammar elements are used throughout this specification. ZeroComponent = "0" NonZeroDigit = "1" / "2" / "3" / "4" / "5" / "6" / "7" / "8" / "9" Digit = "0" / NonZeroDigit NonZeroComponent = NonZeroDigit 0*Digit
+
+NumericComponent = ZeroComponent / NonZeroComponent PaddedNumericComponent = 1*Digit PaddedNumericComponentOrEmpty = 0*Digit
+
+UpperAlpha = %x41-5A ; A-Z LowerAlpha = %x61-7A ; a-z OtherChar = "!" / "'" / "(" / ")" / "*" / "+" / "," / "-" / "." / ":" / ";" / "=" / "_" UpperHexChar = Digit / "A" / "B" / "C" / "D" / "E" / "F" HexChar = UpperHexChar / "a" / "b" / "c" / "d" / "e" / "f" HexComponent = 1*UpperHexChar HexComponentOrEmpty = 0*UpperHexChar Escape = "%" HexChar HexChar
+
+GS3A3Char = Digit / UpperAlpha / LowerAlpha / OtherChar / Escape GS3A3Component = 1*GS3A3Char
+
+[...]
+
+6.3.1
+
+Serialised Global Trade Item Number (SGTIN)
+The Serialised Global Trade Item Number EPC scheme is used to assign a unique identity to an instance of a trade item, such as a specific instance of a product or SKU.
+
+General syntax:
+urn:epc:id:sgtin:CompanyPrefix.ItemRefAndIndicator.SerialNumber
+
+Example:
+urn:epc:id:sgtin:9521141.012345.4711
+
+Grammar:
+SGTIN-URI = %s"urn:epc:id:sgtin:" SGTINURIBody
+SGTINURIBody = 2(PaddedNumericComponent ".") GS3A3Component
+The number of characters in the two PaddedNumericComponent fields must total 13 (not including any of the dot characters).
+The Serial Number field of the SGTIN-URI is expressed as a GS3A3Component, which permits the representation of all characters permitted
+in the Application Identifier 21 Serial Number according to the GS1 General Specifications. SGTIN-URIs that are derived from 96-bit tag encodings, however, will have Serial Numbers that consist only of digits and which have no leading zeros (unless the entire serial number consists of a single zero digit). These limitations are described in the encoding procedures, and in Section 12.3.1.
+The SGTIN consists of the following elements:
+- The GS1 Company Prefix, assigned by GS1 to a managing entity or its delegates. This is the same as the GS1 Company Prefix digits within a GS1 GTIN key. See Section 7.3.2 for the case of a GTIN-8.
+
+- The Item Reference, assigned by the managing entity to a particular object class. The Item Reference as it appears in the EPC URI is derived from the GTIN by concatenating the Indicator Digit of the GTIN (or a zero pad character, if the EPC URI is derived from a GTIN-8, GTIN-12, or GTIN-13) and the Item Reference digits, and treating the result as a single numeric string. See Section 7.3.2 for the case of a GTIN-8.
+- The Serial Number, assigned by the managing entity to an individual object. The serial number is not part of the GTIN, but is formally a part of the SGTIN.
+
+6.3.2
+
+Serial Shipping Container Code (SSCC)
+The Serial Shipping Container Code EPC scheme is used to assign a unique identity to a logistics handling unit, such as the aggregate contents of a shipping container or a pallet load.
+
+General syntax:
+urn:epc:id:sscc:CompanyPrefix.SerialReference
+
+Example:
+urn:epc:id:sscc:9521141.1234567890
+
+Grammar:
+SSCC-URI = %s"urn:epc:id:sscc:" SSCCURIBody
+SSCCURIBody = PaddedNumericComponent "." PaddedNumericComponent
+The number of characters in the two PaddedNumericComponent fields must total 17 (not including any of the dot characters).
+The SSCC consists of the following elements: - The GS1 Company Prefix, assigned by GS1 to a managing entity. This is the same as the GS1 Company Prefix digits within a GS1 SSCC key. - The Serial Reference, assigned by the managing entity to a particular logistics handling unit. The Serial Reference as it appears in the EPC URI
+is derived from the SSCC by concatenating the Extension Digit of the SSCC and the Serial Reference digits, and treating the result as a single numeric string.
+
+6.3.3
+
+Global Location Number With or Without Extension (SGLN)
+The SGLN EPC scheme is used to assign a unique identity to a physical location, such as a specific building or a specific unit of shelving within a warehouse.
+General syntax:
+urn:epc:id:sgln:CompanyPrefix.LocationReference.Extension
+
+Example:
+urn:epc:id:sgln:9521141.12345.400
+
+Grammar:
+SGLN-URI = %s"urn:epc:id:sgln:" SGLNURIBody
+SGLNURIBody = PaddedNumericComponent "." PaddedNumericComponentOrEmpty "." GS3A3Component
+The number of characters in the two PaddedNumericComponent fields must total 12 (not including any of the dot characters).
+The Extension field of the SGLN-URI is expressed as a GS3A3Component, which permits the representation of all characters permitted in
+the Application Identifier 254 Extension according to the GS1 General Specifications. SGLN-URIs that are derived from 96-bit tag encodings, however, will have Extensions that consist only of digits and which have no leading zeros (unless the entire extension consists of a single zero digit). These limitations are described in the encoding procedures, and in Section 12.3.1.
+The SGLN consists of the following elements:
+- The GS1 Company Prefix, assigned by GS1 to a managing entity. This is the same as the GS1 Company Prefix digits within a GS1 GLN key.
+- The Location Reference, assigned uniquely by the managing entity to a specific physical location.
+
+[...]
+
+Serialised Global Trade Item Number (SGTIN)
+The SGTIN EPC (Section 6.3.1) does not correspond directly to any GS1 key, but instead corresponds to a combination of a GTIN key plus a serial number. The serial number in the SGTIN is defined to be equivalent to Application Identifier 21 in the GS1 General Specifications.
+
+The correspondence between the SGTIN EPC URI and a GS1 element string consisting of a GTIN key (Application Identifier 01) and a serial number (Application Identifier 21) is depicted graphically below:
+Figure 7-1 Correspondence between SGTIN EPC URI and GS1 element string
+
+(Note that in the case of a GTIN-12 or GTIN-13, a zero pad character takes the place of the Indicator Digit in the figure above.) Formally, the correspondence is defined as follows. Let the EPC URI and the GS1 element string be written as follows:
+EPC URI: urn:epc:id:sgtin:d2...d(L+1).d1d(L+2)d(L+3)...d13.s1s2...sK GS1 element string: (01)d1d2...d14 (21)s1s2...sK
+where 1 <= K <= 20.
+
+To find the GS1 element string corresponding to an SGTIN EPC URI:
+
+1. Number the digits of the first two components of the EPC as shown above. Note that there will always be a total of 13 digits.
+
+2. Number the characters of the serial number (third) component of the EPC as shown above. Each si corresponds to either a single character or to a percent-escape triplet consisting of a % character followed by two hexadecimal digit characters.
+
+3. Calculate the check digit d14 = (10 - ((3(d1 + d3 + d5 + d7 + d9 + d11 + d13) + (d2 + d4 + d6 + d8 + d10 + d12)) mod 10)) mod 10.
+
+4. Arrange the resulting digits and characters as shown for the GS1 element string. If any si in the EPC URI is a percent-escape triplet %xx, in the GS1 element string replace the triplet with the corresponding character according to Table A-1 (For a given percent-escape triplet %xx, find the row of Table A-1 that contains xx in the "Hex Value" column; the "Graphic symbol" column then gives the
+corresponding character to use in the GS1 element string.)
+
+To find the EPC URI corresponding to a GS1 element string that includes both a GTIN (Application Identifier 01) and a serial number (Application Identifier 21): 1. Number the digits and characters of the GS1 element string as shown above. 2. Except for a GTIN-8, determine the number of digits L in the GS1 Company Prefix. This may be done, for example, by reference to an
+external table of company prefixes. See Section 7.3.2 for the case of a GTIN-8. 3. Arrange the digits as shown for the EPC URI. Note that the GTIN check digit d14 is not included in the EPC URI. For each serial number
+
+[...]
+
+The Registrant Group Elements are assigned to ISBN registration agencies, who in turn assign Registrant Elements to publishers, who in turn assign Publication Elements to individual publication editions. This exactly parallels the construction of GTIN codes. As in GTIN, the various components are of variable length, and as in GTIN, each publisher knows the combined length of the Registrant Group Element and Registrant Element, as the combination is assigned to the publisher. The total length of the "978" or "979" Prefix Element, the Registrant Group Element, and the Registrant Element is in the range of 6 to 12 digits, which is exactly the range of GS1 Company Prefix lengths permitted in the SGTIN EPC. The ISBN and ISMN can thus be used to construct SGTINs as specified in this standard.

@@ -1,0 +1,280 @@
+{
+  "tool": "epcis-event-check",
+  "version": "1.0.0",
+  "input": {
+    "file": "examples/good/events.json",
+    "format": "json",
+    "bytes": 5263,
+    "lines": 111
+  },
+  "document": {
+    "form": "document",
+    "type": "EPCISDocument",
+    "schemaVersion": "2.0",
+    "creationDate": "2101-03-10T12:00:00.000Z",
+    "events": 8,
+    "epcs": 5,
+    "classes": 2,
+    "places": 2,
+    "firstEventTime": "2101-03-01T08:00:00.000+01:00",
+    "lastEventTime": "2101-03-04T11:00:00.000+01:00"
+  },
+  "totals": {
+    "findings": 0,
+    "byLevel": {
+      "error": 0,
+      "warning": 0,
+      "info": 0
+    },
+    "hidden": 0
+  },
+  "rules": [
+    {
+      "id": "file-unreadable",
+      "level": "error",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "field-missing",
+      "level": "error",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "field-unknown",
+      "level": "warning",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "field-invalid",
+      "level": "error",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "field-duplicate",
+      "level": "error",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "secret-in-file",
+      "level": "error",
+      "kind": "input",
+      "findings": 0
+    },
+    {
+      "id": "event-type-unknown",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "event-time-missing",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "event-time-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "timezone-offset-missing",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "timezone-offset-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "action-missing",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "action-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "transformation-with-action",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "what-missing",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "transformation-inputs-outputs-empty",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "quantity-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "where-missing",
+      "level": "warning",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "why-missing",
+      "level": "warning",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "biz-step-unknown",
+      "level": "warning",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "disposition-unknown",
+      "level": "warning",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "event-id-duplicate",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "event-id-missing",
+      "level": "info",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "event-out-of-order",
+      "level": "warning",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "future-event",
+      "level": "error",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "object-after-delete",
+      "level": "warning",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "shipped-before-received",
+      "level": "warning",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "aggregation-child-in-two-parents",
+      "level": "warning",
+      "kind": "best practice",
+      "findings": 0
+    },
+    {
+      "id": "epc-uri-malformed",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "gtin-check-digit-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "sscc-check-digit-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    },
+    {
+      "id": "gln-check-digit-invalid",
+      "level": "error",
+      "kind": "documented",
+      "findings": 0
+    }
+  ],
+  "options": {
+    "minSeverity": "info",
+    "failOn": "error",
+    "now": "2101-03-10T12:00:00Z"
+  },
+  "findings": [],
+  "eventTypes": [
+    {
+      "type": "ObjectEvent",
+      "events": 3,
+      "ADD": 1,
+      "OBSERVE": 2,
+      "DELETE": 0,
+      "none": 0
+    },
+    {
+      "type": "AggregationEvent",
+      "events": 2,
+      "ADD": 1,
+      "OBSERVE": 0,
+      "DELETE": 1,
+      "none": 0
+    },
+    {
+      "type": "TransactionEvent",
+      "events": 1,
+      "ADD": 1,
+      "OBSERVE": 0,
+      "DELETE": 0,
+      "none": 0
+    },
+    {
+      "type": "TransformationEvent",
+      "events": 1,
+      "ADD": 0,
+      "OBSERVE": 0,
+      "DELETE": 0,
+      "none": 1
+    },
+    {
+      "type": "AssociationEvent",
+      "events": 1,
+      "ADD": 1,
+      "OBSERVE": 0,
+      "DELETE": 0,
+      "none": 0
+    }
+  ],
+  "notes": [],
+  "notice": "This report is an input to a review of EPCIS events before they are written to a shared supply chain ledger: not a certification of conformance to EPCIS or the CBV, not an audit of the supply chain and not a guarantee that the events describe what really happened.",
+  "result": {
+    "pass": true,
+    "failOn": "error",
+    "text": "PASS - no finding at or above error"
+  }
+}

@@ -1,0 +1,36 @@
+epcis-event-check checks
+
+  file-unreadable                      error    input          the file is not JSON the reader can follow, or its top level is neither an object nor a list, so nothing in it was read
+  field-missing                        error    input          a field the file needs is not there: the type of an event, the @context, type, schemaVersion, creationDate or epcisBody of a document, its eventList, the id of a readPoint or bizLocation, the epcClass of a quantity, the bizTransaction of a business transaction, the type and value of a source or destination, or the declarationTime of an error declaration
+  field-unknown                        warning  input          a key the tool does not read in that place, often a misspelt one or the field of another event type; its value was left out of every check. A key with a colon is an extension and is left alone
+  field-invalid                        error    input          a value of the wrong type or form: text where a list or an object belongs, a quantity written as text, an identifier that is not a URI, a document type or schema version the tool does not know, or a creationDate that is not a date and time with a zone
+  field-duplicate                      error    input          one EPC listed twice in the same list of one event
+  secret-in-file                       error    input          the file holds a private key, a seed or a mnemonic, under a key named for one or as a value shaped like one; the tool never reads it and never shows it
+  event-type-unknown                   error    documented     the type of an event is a word that is not one of the five event types of EPCIS 2.0; a type named by a URI is an extension and is only noted
+  event-time-missing                   error    documented     an event has no eventTime, the field EPCIS calls mandatory in every event
+  event-time-invalid                   error    documented     an eventTime, recordTime or declarationTime that is not a date and time with a time zone, or names a day, hour or zone that does not exist
+  timezone-offset-missing              error    documented     an event has no eventTimeZoneOffset, which the JSON schema requires next to the eventTime
+  timezone-offset-invalid              error    documented     an eventTimeZoneOffset that is not a sign, two digits of hours from 00 to 14, a colon and two digits of minutes, or that has minutes with 14 hours
+  action-missing                       error    documented     an ObjectEvent, AggregationEvent, TransactionEvent or AssociationEvent has no action
+  action-invalid                       error    documented     an action that is not ADD, OBSERVE or DELETE, written in capitals
+  transformation-with-action           error    documented     a TransformationEvent has an action, a field its type does not have
+  what-missing                         error    documented     an event does not name its objects as EPCIS asks: an ObjectEvent or TransactionEvent with no EPC and no quantity, an AggregationEvent or AssociationEvent with no child unless it removes them all, one with action ADD or DELETE and no parentID, or a TransactionEvent with no business transaction
+  transformation-inputs-outputs-empty  error    documented     a TransformationEvent with no transformationID lacks inputs or outputs, or one with a transformationID has neither
+  quantity-invalid                     error    documented     a quantity of 0 or below, a count that is not a whole number with no unit of measure, a unit of measure with no quantity, or a unit that is not a code of two or three capitals and digits
+  where-missing                        warning  best practice  an event has neither a readPoint nor a bizLocation, so no one can tell where it took place
+  why-missing                          warning  documented     an event has no bizStep, though the CBV says that each event should carry one
+  biz-step-unknown                     warning  documented     a bizStep that is not a business step of the CBV, alone or after a prefix of the CBV; a URI of another vocabulary is left alone
+  disposition-unknown                  warning  documented     a disposition or persistent disposition that is not a disposition of the CBV, or is one the CBV deprecates; a URI of another vocabulary is left alone
+  event-id-duplicate                   error    documented     two events of the file have the same eventID, and neither is an error declaration
+  event-id-missing                     info     best practice  an event has no eventID, so a ledger cannot tell the same event sent twice from two events; a note
+  event-out-of-order                   warning  best practice  a recordTime earlier than its eventTime, or an event listed after another event of the same EPC but with an earlier eventTime
+  future-event                         error    best practice  an eventTime or recordTime later than the moment given with --now; without --now the check does not run
+  object-after-delete                  warning  documented     an EPC that appears in an event later than an ObjectEvent with action DELETE, or than an event of the business step decommissioning or destroying, that named it
+  shipped-before-received              warning  best practice  an EPC shipped from a place it was never seen at before, while earlier events put it elsewhere, or that is received at that place only after it was shipped from there
+  aggregation-child-in-two-parents     warning  best practice  a child EPC added to or observed in one parent while an earlier AggregationEvent put it in another parent and no event took it out
+  epc-uri-malformed                    error    documented     an SGTIN, SSCC, SGLN, LGTIN or SGTIN pattern URI whose company prefix and reference do not add up to the digits of its scheme, or with a serial, lot or extension it does not allow, or a GS1 Digital Link URI with a key of the wrong length
+  gtin-check-digit-invalid             error    documented     a GTIN in a GS1 Digital Link URI whose last digit is not its check digit
+  sscc-check-digit-invalid             error    documented     an SSCC in a GS1 Digital Link URI whose last digit is not its check digit
+  gln-check-digit-invalid              error    documented     a GLN in a GS1 Digital Link URI whose last digit is not its check digit
+
+A documented check rests on the EPCIS standard, its JSON schema, the CBV, the Tag Data Standard and the GS1 General Specifications; a best practice check is this tool's own choice and says so in its message. An input check is about the file itself. None of it certifies conformance.

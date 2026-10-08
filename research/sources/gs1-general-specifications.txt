@@ -1,0 +1,87 @@
+Source: https://ref.gs1.org/standards/genspecs/
+Read as the PDF the address returns (GS1 General Specifications Standard, Release 26.0, Ratified), fetched with curl and turned into text with pdftotext; only the parts the checks rest on are kept, each as it was read, with "[...]" where text was left out.
+
+GS1 General Specifications Standard
+
+The foundational GS1 standard that defines how identification keys, data attributes and barcodes must be used in business applications.
+
+[...]
+
+952
+
+Used for demonstrations and examples of the GS1 system
+
+[...]
+
+7.9 Check digit/character calculations
+
+7.9.1
+
+Standard check digit calculations for GS1 data structures
+This algorithm is identical for all fixed length numeric GS1 data structures (including GDTI, GLN, GRAI, etc.) that require a check digit.
+
+Table 7-8 Check digit algorithm
+
+Digit positions
+
+GTIN-8
+
+N1 N2 N3 N4 N5 N6 N7 N8
+
+GTIN-12
+
+N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12
+
+GTIN-13
+
+N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13
+
+GTIN-14
+
+N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14
+
+17 digits
+
+N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 N15 N16 N17
+
+18 digits N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 N15 N16 N17 N18
+
+Multiply value of each position by
+
+x3 X1 x3 x1 x3 x1 x3 x1 x3 x1 x3 x1 x3 x1 x3 x1 x3
+
+Accumulated results = sum
+
+Subtract sum from nearest equal or higher multiple of ten = check digit
+
+-
+
+Table 7-9 Check digit calculation example
+
+Example of a check digit calculation for the 18-digit field
+
+Positions
+
+N1 N2 N3 N4 N5 N6 N7 N8 N9 N10 N11 N12 N13 N14 N15 N16 N17 N18
+
+Number without
+
+check digit
+
+3 7 6 1 0 4 2 5 0 0 2 1 2 3 4 5 6
+
+Step 1: multiply x x x x x x x x x x x x x x x x x
+
+by
+
+3 1 3 1 3 1 3 1 3 1 3 1 3 1 3 1 3
+
+Step 2: add up = = = = = = = = = = = = = = = = =
+
+results to sum
+
+9 7 18 1 0 4 6 5 0 0 6 1 6 3 12 5 18 = 101
+
+Step 3: Subtract sum from nearest equal or higher multiple of ten (110) = check digit (9)
+
+Number with check digit

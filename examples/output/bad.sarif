@@ -1,0 +1,1381 @@
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "epcis-event-check",
+          "version": "1.0.0",
+          "informationUri": "https://github.com/INNERLUXES/epcis-event-check",
+          "rules": [
+            {
+              "id": "file-unreadable",
+              "name": "file-unreadable",
+              "shortDescription": {
+                "text": "the file is not JSON the reader can follow, or its top level is neither an object nor a list, so nothing in it was read"
+              },
+              "help": {
+                "text": "Write the file as one EPCISDocument in JSON, with the events in epcisBody.eventList, or as a JSON list of events (docs/inputs.md); fix the line named. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "field-missing",
+              "name": "field-missing",
+              "shortDescription": {
+                "text": "a field the file needs is not there: the type of an event, the @context, type, schemaVersion, creationDate or epcisBody of a document, its eventList, the id of a readPoint or bizLocation, the epcClass of a quantity, the bizTransaction of a business transaction, the type and value of a source or destination, or the declarationTime of an error declaration"
+              },
+              "help": {
+                "text": "Add the field named; docs/inputs.md lists what each part of the file needs. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "field-unknown",
+              "name": "field-unknown",
+              "shortDescription": {
+                "text": "a key the tool does not read in that place, often a misspelt one or the field of another event type; its value was left out of every check. A key with a colon is an extension and is left alone"
+              },
+              "help": {
+                "text": "Correct the spelling to a field of docs/inputs.md, move the field to the event type it belongs to, or name an extension field with a prefix such as example:field. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "field-invalid",
+              "name": "field-invalid",
+              "shortDescription": {
+                "text": "a value of the wrong type or form: text where a list or an object belongs, a quantity written as text, an identifier that is not a URI, a document type or schema version the tool does not know, or a creationDate that is not a date and time with a zone"
+              },
+              "help": {
+                "text": "Write the value as docs/inputs.md shows: text for times, identifiers and vocabulary values, lists for the lists of EPCs and quantities, objects for locations, and JSON numbers for quantities. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "field-duplicate",
+              "name": "field-duplicate",
+              "shortDescription": {
+                "text": "one EPC listed twice in the same list of one event"
+              },
+              "help": {
+                "text": "List each EPC once in each list. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "secret-in-file",
+              "name": "secret-in-file",
+              "shortDescription": {
+                "text": "the file holds a private key, a seed or a mnemonic, under a key named for one or as a value shaped like one; the tool never reads it and never shows it"
+              },
+              "help": {
+                "text": "Remove the value from the file and from wherever the file was copied, treat it as exposed and move what it controls to a new key. An event names objects, places and transactions, never the key of a ledger account. (input)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "input"
+              }
+            },
+            {
+              "id": "event-type-unknown",
+              "name": "event-type-unknown",
+              "shortDescription": {
+                "text": "the type of an event is a word that is not one of the five event types of EPCIS 2.0; a type named by a URI is an extension and is only noted"
+              },
+              "help": {
+                "text": "Write ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent or AssociationEvent, with that spelling and case. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "event-time-missing",
+              "name": "event-time-missing",
+              "shortDescription": {
+                "text": "an event has no eventTime, the field EPCIS calls mandatory in every event"
+              },
+              "help": {
+                "text": "Add the eventTime: the date, time and time zone at which the event took place. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "event-time-invalid",
+              "name": "event-time-invalid",
+              "shortDescription": {
+                "text": "an eventTime, recordTime or declarationTime that is not a date and time with a time zone, or names a day, hour or zone that does not exist"
+              },
+              "help": {
+                "text": "Write the time as YYYY-MM-DDThh:mm:ss, with an optional fraction of a second, and end it with Z or an offset such as +01:00. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "timezone-offset-missing",
+              "name": "timezone-offset-missing",
+              "shortDescription": {
+                "text": "an event has no eventTimeZoneOffset, which the JSON schema requires next to the eventTime"
+              },
+              "help": {
+                "text": "Add the eventTimeZoneOffset in effect where the event took place, such as +01:00, even when the eventTime is written in UTC. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "timezone-offset-invalid",
+              "name": "timezone-offset-invalid",
+              "shortDescription": {
+                "text": "an eventTimeZoneOffset that is not a sign, two digits of hours from 00 to 14, a colon and two digits of minutes, or that has minutes with 14 hours"
+              },
+              "help": {
+                "text": "Write the offset as +hh:mm or -hh:mm, such as +05:30 or -08:00; write Z as +00:00. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "action-missing",
+              "name": "action-missing",
+              "shortDescription": {
+                "text": "an ObjectEvent, AggregationEvent, TransactionEvent or AssociationEvent has no action"
+              },
+              "help": {
+                "text": "Add the action: ADD when the objects or the link are created, OBSERVE when they are seen unchanged, DELETE when they end. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "action-invalid",
+              "name": "action-invalid",
+              "shortDescription": {
+                "text": "an action that is not ADD, OBSERVE or DELETE, written in capitals"
+              },
+              "help": {
+                "text": "Write ADD, OBSERVE or DELETE, in capitals; EPCIS allows no other value. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "transformation-with-action",
+              "name": "transformation-with-action",
+              "shortDescription": {
+                "text": "a TransformationEvent has an action, a field its type does not have"
+              },
+              "help": {
+                "text": "Remove the action; a TransformationEvent says what was used and what was made through its inputs and outputs. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "what-missing",
+              "name": "what-missing",
+              "shortDescription": {
+                "text": "an event does not name its objects as EPCIS asks: an ObjectEvent or TransactionEvent with no EPC and no quantity, an AggregationEvent or AssociationEvent with no child unless it removes them all, one with action ADD or DELETE and no parentID, or a TransactionEvent with no business transaction"
+              },
+              "help": {
+                "text": "Name the objects in the lists of the event type, the parent of an aggregation or association that is added or removed, and the business transaction of a TransactionEvent. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "transformation-inputs-outputs-empty",
+              "name": "transformation-inputs-outputs-empty",
+              "shortDescription": {
+                "text": "a TransformationEvent with no transformationID lacks inputs or outputs, or one with a transformationID has neither"
+              },
+              "help": {
+                "text": "List what was used in inputEPCList or inputQuantityList and what was made in outputEPCList or outputQuantityList, or link events of one process with a transformationID. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "quantity-invalid",
+              "name": "quantity-invalid",
+              "shortDescription": {
+                "text": "a quantity of 0 or below, a count that is not a whole number with no unit of measure, a unit of measure with no quantity, or a unit that is not a code of two or three capitals and digits"
+              },
+              "help": {
+                "text": "Write a count of objects as a positive whole number with no uom, or a measure as a positive number with its UN/CEFACT code, such as KGM; leave the uom out when the quantity is unknown. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "where-missing",
+              "name": "where-missing",
+              "shortDescription": {
+                "text": "an event has neither a readPoint nor a bizLocation, so no one can tell where it took place"
+              },
+              "help": {
+                "text": "Add the readPoint where the event was seen, and the bizLocation where the objects are afterwards when they stay there. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "why-missing",
+              "name": "why-missing",
+              "shortDescription": {
+                "text": "an event has no bizStep, though the CBV says that each event should carry one"
+              },
+              "help": {
+                "text": "Add the bizStep of the business process, such as shipping, receiving or commissioning. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "biz-step-unknown",
+              "name": "biz-step-unknown",
+              "shortDescription": {
+                "text": "a bizStep that is not a business step of the CBV, alone or after a prefix of the CBV; a URI of another vocabulary is left alone"
+              },
+              "help": {
+                "text": "Use a value of the CBV table, in lower case with underscores, such as shipping; name a step of your own with a URI of your own domain. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "disposition-unknown",
+              "name": "disposition-unknown",
+              "shortDescription": {
+                "text": "a disposition or persistent disposition that is not a disposition of the CBV, or is one the CBV deprecates; a URI of another vocabulary is left alone"
+              },
+              "help": {
+                "text": "Use a value of the CBV table, such as in_transit or sellable_accessible, or the value that replaces a deprecated one. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "event-id-duplicate",
+              "name": "event-id-duplicate",
+              "shortDescription": {
+                "text": "two events of the file have the same eventID, and neither is an error declaration"
+              },
+              "help": {
+                "text": "Give every event an eventID of its own, such as a UUID URI; an error declaration keeps the eventID of the event it corrects. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "event-id-missing",
+              "name": "event-id-missing",
+              "shortDescription": {
+                "text": "an event has no eventID, so a ledger cannot tell the same event sent twice from two events; a note"
+              },
+              "help": {
+                "text": "Give each event an eventID, such as a UUID URI or the hash ID of the CBV, when the events go to a ledger. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "note"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "event-out-of-order",
+              "name": "event-out-of-order",
+              "shortDescription": {
+                "text": "a recordTime earlier than its eventTime, or an event listed after another event of the same EPC but with an earlier eventTime"
+              },
+              "help": {
+                "text": "Check the clocks of the readers and the order the events were captured in; list the events of an object in the order they took place. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "future-event",
+              "name": "future-event",
+              "shortDescription": {
+                "text": "an eventTime or recordTime later than the moment given with --now; without --now the check does not run"
+              },
+              "help": {
+                "text": "Correct the clock or the time zone of the system that wrote the event; an event cannot take place after it is reported. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "object-after-delete",
+              "name": "object-after-delete",
+              "shortDescription": {
+                "text": "an EPC that appears in an event later than an ObjectEvent with action DELETE, or than an event of the business step decommissioning or destroying, that named it"
+              },
+              "help": {
+                "text": "Check whether the later event read the wrong tag or the delete was a mistake; correct the wrong event with an error declaration rather than a new event. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "shipped-before-received",
+              "name": "shipped-before-received",
+              "shortDescription": {
+                "text": "an EPC shipped from a place it was never seen at before, while earlier events put it elsewhere, or that is received at that place only after it was shipped from there"
+              },
+              "help": {
+                "text": "Check the readPoint and source of the shipping event and whether an event of the arrival is missing or out of place. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "aggregation-child-in-two-parents",
+              "name": "aggregation-child-in-two-parents",
+              "shortDescription": {
+                "text": "a child EPC added to or observed in one parent while an earlier AggregationEvent put it in another parent and no event took it out"
+              },
+              "help": {
+                "text": "Add the AggregationEvent with action DELETE that took the child out of its first parent, or correct the parent of the later event. (best practice)"
+              },
+              "defaultConfiguration": {
+                "level": "warning"
+              },
+              "properties": {
+                "kind": "best practice"
+              }
+            },
+            {
+              "id": "epc-uri-malformed",
+              "name": "epc-uri-malformed",
+              "shortDescription": {
+                "text": "an SGTIN, SSCC, SGLN, LGTIN or SGTIN pattern URI whose company prefix and reference do not add up to the digits of its scheme, or with a serial, lot or extension it does not allow, or a GS1 Digital Link URI with a key of the wrong length"
+              },
+              "help": {
+                "text": "Write the EPC as the Tag Data Standard does: urn:epc:id:sgtin: with 13 digits before the serial, urn:epc:id:sscc: with 17 digits, urn:epc:id:sgln: with 12 digits before the extension. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "gtin-check-digit-invalid",
+              "name": "gtin-check-digit-invalid",
+              "shortDescription": {
+                "text": "a GTIN in a GS1 Digital Link URI whose last digit is not its check digit"
+              },
+              "help": {
+                "text": "Work the check digit out again from the other digits, or copy the GTIN again from its source. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "sscc-check-digit-invalid",
+              "name": "sscc-check-digit-invalid",
+              "shortDescription": {
+                "text": "an SSCC in a GS1 Digital Link URI whose last digit is not its check digit"
+              },
+              "help": {
+                "text": "Work the check digit out again from the first 17 digits, or copy the SSCC again from the label. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            },
+            {
+              "id": "gln-check-digit-invalid",
+              "name": "gln-check-digit-invalid",
+              "shortDescription": {
+                "text": "a GLN in a GS1 Digital Link URI whose last digit is not its check digit"
+              },
+              "help": {
+                "text": "Work the check digit out again from the first 12 digits, or copy the GLN again from the master data of the location. (documented)"
+              },
+              "defaultConfiguration": {
+                "level": "error"
+              },
+              "properties": {
+                "kind": "documented"
+              }
+            }
+          ]
+        }
+      },
+      "artifacts": [
+        {
+          "location": {
+            "uri": "examples/bad/events.json"
+          }
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "secret-in-file",
+          "ruleIndex": 5,
+          "level": "error",
+          "message": {
+            "text": "The file holds the key \"mnemonic\", which names a seed, a mnemonic or a private key. The tool never reads one, and the value is not shown. Fix: Remove the value from the file and from wherever the file was copied, treat it as exposed and move what it controls to a new key. An event names objects, places and transactions, never the key of a ledger account."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 7,
+                  "startColumn": 20
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "input",
+            "subject": null
+          }
+        },
+        {
+          "ruleId": "field-duplicate",
+          "ruleIndex": 4,
+          "level": "error",
+          "message": {
+            "text": "The epcList of event 1 (ObjectEvent) lists urn:epc:id:sgtin:9521234.012345.1001 twice, on line 15; an EPC is listed once. Fix: List each EPC once in each list."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 15,
+                  "startColumn": 61
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "input",
+            "subject": "event 1"
+          }
+        },
+        {
+          "ruleId": "event-type-unknown",
+          "ruleIndex": 6,
+          "level": "error",
+          "message": {
+            "text": "Event 2 has the type \"Object\", which is not one of the five event types of EPCIS 2.0 (ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent and AssociationEvent), so its fields were not checked against a type. Did you mean ObjectEvent? The type of an extension is a URI. Fix: Write ObjectEvent, AggregationEvent, TransactionEvent, TransformationEvent or AssociationEvent, with that spelling and case."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 22,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 2"
+          }
+        },
+        {
+          "ruleId": "event-time-missing",
+          "ruleIndex": 7,
+          "level": "error",
+          "message": {
+            "text": "Event 3 (ObjectEvent) has no eventTime; EPCIS calls eventTime mandatory in every event, so no one can tell when it took place. Fix: Add the eventTime: the date, time and time zone at which the event took place."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 31,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 3"
+          }
+        },
+        {
+          "ruleId": "event-time-invalid",
+          "ruleIndex": 8,
+          "level": "error",
+          "message": {
+            "text": "The eventTime of event 4 (ObjectEvent), \"2101-03-01T08:20:00\", has no time zone, so the moment it names is not known; end it with Z or an offset such as +01:00. EPCIS types it as xsd:dateTimeStamp, a date and time with its time zone. Fix: Write the time as YYYY-MM-DDThh:mm:ss, with an optional fraction of a second, and end it with Z or an offset such as +01:00."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 43,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 4"
+          }
+        },
+        {
+          "ruleId": "timezone-offset-invalid",
+          "ruleIndex": 10,
+          "level": "error",
+          "message": {
+            "text": "The eventTimeZoneOffset of event 4 (ObjectEvent), \"+14:30\", has 14 hours with minutes other than 00; EPCIS writes it as a sign, two digits of hours from 00 to 14, a colon and two digits of minutes. Fix: Write the offset as +hh:mm or -hh:mm, such as +05:30 or -08:00; write Z as +00:00."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 44,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 4"
+          }
+        },
+        {
+          "ruleId": "action-invalid",
+          "ruleIndex": 12,
+          "level": "error",
+          "message": {
+            "text": "The action of event 4 (ObjectEvent) is \"add\"; write it in capitals, ADD. EPCIS allows only ADD, OBSERVE and DELETE, and no group may add another. Fix: Write ADD, OBSERVE or DELETE, in capitals; EPCIS allows no other value."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 46,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 4"
+          }
+        },
+        {
+          "ruleId": "action-missing",
+          "ruleIndex": 11,
+          "level": "error",
+          "message": {
+            "text": "Event 5 (AggregationEvent) has no action; the JSON schema of AggregationEvent requires one, ADD, OBSERVE or DELETE, to say how the event changes what it names. Fix: Add the action: ADD when the objects or the link are created, OBSERVE when they are seen unchanged, DELETE when they end."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 50,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 5"
+          }
+        },
+        {
+          "ruleId": "timezone-offset-missing",
+          "ruleIndex": 9,
+          "level": "error",
+          "message": {
+            "text": "Event 5 (AggregationEvent) has no eventTimeZoneOffset, which the JSON schema of EPCIS 2.0 requires next to the eventTime: the offset from UTC in effect where the event took place. Fix: Add the eventTimeZoneOffset in effect where the event took place, such as +01:00, even when the eventTime is written in UTC."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 50,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 5"
+          }
+        },
+        {
+          "ruleId": "transformation-with-action",
+          "ruleIndex": 13,
+          "level": "error",
+          "message": {
+            "text": "Event 8 (TransformationEvent) has an action (ADD), but the fields EPCIS gives a TransformationEvent hold no action, and its JSON schema does not allow one. Fix: Remove the action; a TransformationEvent says what was used and what was made through its inputs and outputs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 86,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 8"
+          }
+        },
+        {
+          "ruleId": "transformation-inputs-outputs-empty",
+          "ruleIndex": 15,
+          "level": "error",
+          "message": {
+            "text": "Event 8 (TransformationEvent) has no output and no transformationID; EPCIS asks such a TransformationEvent for at least one input and one output. Fix: List what was used in inputEPCList or inputQuantityList and what was made in outputEPCList or outputQuantityList, or link events of one process with a transformationID."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 87,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 8"
+          }
+        },
+        {
+          "ruleId": "quantity-invalid",
+          "ruleIndex": 16,
+          "level": "error",
+          "message": {
+            "text": "The quantity of item 1 of the inputQuantityList of event 8 (TransformationEvent) is 2.5 with no uom; EPCIS reads a quantity with no unit of measure as a count, which must be a positive whole number. Add the uom of the measure, such as KGM. Fix: Write a count of objects as a positive whole number with no uom, or a measure as a positive number with its UN/CEFACT code, such as KGM; leave the uom out when the quantity is unknown."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 87,
+                  "startColumn": 86
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 8"
+          }
+        },
+        {
+          "ruleId": "field-invalid",
+          "ruleIndex": 3,
+          "level": "error",
+          "message": {
+            "text": "The quantity of item 1 of the quantityList of event 9 (ObjectEvent) is \"5\"; it must be a JSON number. Fix: Write the value as docs/inputs.md shows: text for times, identifiers and vocabulary values, lists for the lists of EPCs and quantities, objects for locations, and JSON numbers for quantities."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 97,
+                  "startColumn": 81
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "input",
+            "subject": "event 9"
+          }
+        },
+        {
+          "ruleId": "event-id-duplicate",
+          "ruleIndex": 21,
+          "level": "error",
+          "message": {
+            "text": "The eventID of event 10 (ObjectEvent), urn:uuid:00000000-0000-4000-8000-000000000009, is also the eventID of event 9 at line 93; EPCIS asks for an eventID unique across all events but error declarations. Fix: Give every event an eventID of its own, such as a UUID URI; an error declaration keeps the eventID of the event it corrects."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 104,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 10"
+          }
+        },
+        {
+          "ruleId": "field-missing",
+          "ruleIndex": 1,
+          "level": "error",
+          "message": {
+            "text": "The readPoint of event 10 (ObjectEvent) has no id. Fix: Add the field named; docs/inputs.md lists what each part of the file needs."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 110,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "input",
+            "subject": "event 10"
+          }
+        },
+        {
+          "ruleId": "epc-uri-malformed",
+          "ruleIndex": 28,
+          "level": "error",
+          "message": {
+            "text": "An EPC of the epcList of event 15 (ObjectEvent), urn:epc:id:sgtin:9521234.01234.1, is an SGTIN URI that has 12 digits in its company prefix and an indicator and item reference, not 13. Fix: Write the EPC as the Tag Data Standard does: urn:epc:id:sgtin: with 13 digits before the serial, urn:epc:id:sscc: with 17 digits, urn:epc:id:sgln: with 12 digits before the extension."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 158,
+                  "startColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 15"
+          }
+        },
+        {
+          "ruleId": "gtin-check-digit-invalid",
+          "ruleIndex": 29,
+          "level": "error",
+          "message": {
+            "text": "The GTIN 09521234123457 in an EPC of the epcList of event 15 (ObjectEvent) ends with 7, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place. Fix: Work the check digit out again from the other digits, or copy the GTIN again from its source."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 158,
+                  "startColumn": 57
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 15"
+          }
+        },
+        {
+          "ruleId": "sscc-check-digit-invalid",
+          "ruleIndex": 30,
+          "level": "error",
+          "message": {
+            "text": "The SSCC 095212340000000010 in an EPC of the epcList of event 15 (ObjectEvent) ends with 0, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place. Fix: Work the check digit out again from the first 17 digits, or copy the SSCC again from the label."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 158,
+                  "startColumn": 102
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 15"
+          }
+        },
+        {
+          "ruleId": "gln-check-digit-invalid",
+          "ruleIndex": 31,
+          "level": "error",
+          "message": {
+            "text": "The GLN 9521234000019 in the id of the readPoint of event 15 (ObjectEvent) ends with 9, but its check digit is 3 by the rule of the GS1 General Specifications, so the key names no product, unit or place. Fix: Work the check digit out again from the first 12 digits, or copy the GLN again from the master data of the location."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 161,
+                  "startColumn": 24
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 15"
+          }
+        },
+        {
+          "ruleId": "future-event",
+          "ruleIndex": 24,
+          "level": "error",
+          "message": {
+            "text": "The eventTime of event 16 (ObjectEvent), 2101-03-20T08:00:00.000+01:00, is 846,000 seconds (more than 9 days) after the moment given with --now, 2101-03-10T12:00:00Z, so it names a time that has not come. This is a best practice of this tool, not a rule in the standards it cites. Fix: Correct the clock or the time zone of the system that wrote the event; an event cannot take place after it is reported."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 166,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 16"
+          }
+        },
+        {
+          "ruleId": "what-missing",
+          "ruleIndex": 14,
+          "level": "error",
+          "message": {
+            "text": "Event 17 (TransactionEvent) names no business transaction; a TransactionEvent exists to tie objects to one, so EPCIS asks for its bizTransactionList. Fix: Name the objects in the lists of the event type, the parent of an aggregation or association that is added or removed, and the business transaction of a TransactionEvent."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 172,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 17"
+          }
+        },
+        {
+          "ruleId": "field-unknown",
+          "ruleIndex": 2,
+          "level": "warning",
+          "message": {
+            "text": "The key \"bizLocaton\" of event 1 (ObjectEvent) is not one the tool reads there, so its value was left out of every check. Did you mean \"bizLocation\"? The keys of event 1 (ObjectEvent) are @context, type, eventTime, recordTime, eventTimeZoneOffset, eventID, certificationInfo, errorDeclaration, action, epcList, quantityList, bizStep, disposition, persistentDisposition, readPoint, bizLocation, bizTransactionList, sourceList, destinationList, sensorElementList, ilmd; a key of an extension holds a colon. Fix: Correct the spelling to a field of docs/inputs.md, move the field to the event type it belongs to, or name an extension field with a prefix such as example:field."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 19,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "input",
+            "subject": "event 1"
+          }
+        },
+        {
+          "ruleId": "biz-step-unknown",
+          "ruleIndex": 19,
+          "level": "warning",
+          "message": {
+            "text": "The bizStep of event 4 (ObjectEvent), \"Commissioning\", is not a business step of the CBV; the CBV writes commissioning in lower case with underscores. A step of your own is a URI of your own domain. Fix: Use a value of the CBV table, in lower case with underscores, such as shipping; name a step of your own with a URI of your own domain."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 47,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 4"
+          }
+        },
+        {
+          "ruleId": "aggregation-child-in-two-parents",
+          "ruleIndex": 27,
+          "level": "warning",
+          "message": {
+            "text": "Event 7 (AggregationEvent) adds urn:epc:id:sgtin:9521234.012345.1001 in the parent urn:epc:id:sscc:9521234.0000000003, but event 6 put it in urn:epc:id:sscc:9521234.0000000002 and no event took it out. This is a best practice of this tool, not a rule in the standards it cites. Fix: Add the AggregationEvent with action DELETE that took the child out of its first parent, or correct the parent of the later event."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 76,
+                  "startColumn": 23
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 7"
+          }
+        },
+        {
+          "ruleId": "why-missing",
+          "ruleIndex": 18,
+          "level": "warning",
+          "message": {
+            "text": "Event 10 (ObjectEvent) has no bizStep; the CBV says that every event should carry one, so the business step it was part of is not known. Fix: Add the bizStep of the business process, such as shipping, receiving or commissioning."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 102,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 10"
+          }
+        },
+        {
+          "ruleId": "disposition-unknown",
+          "ruleIndex": 20,
+          "level": "warning",
+          "message": {
+            "text": "The disposition of event 10 (ObjectEvent), \"non_sellable_expired\", is a value the CBV deprecates; use expired. Fix: Use a value of the CBV table, such as in_transit or sellable_accessible, or the value that replaces a deprecated one."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 109,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 10"
+          }
+        },
+        {
+          "ruleId": "object-after-delete",
+          "ruleIndex": 25,
+          "level": "warning",
+          "message": {
+            "text": "Event 12 (ObjectEvent) names urn:epc:id:sgtin:9521234.012345.1003, 3,600 seconds (1 hour) after event 11 ended it with an ObjectEvent with action DELETE, after which EPCIS says the EPC should not be seen again. Fix: Check whether the later event read the wrong tag or the delete was a mistake; correct the wrong event with an error declaration rather than a new event."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 126,
+                  "startColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 12"
+          }
+        },
+        {
+          "ruleId": "biz-step-unknown",
+          "ruleIndex": 19,
+          "level": "warning",
+          "message": {
+            "text": "The bizStep of event 12 (ObjectEvent), \"urn:epcglobal:cbv:bizstep:shipped\", is not a business step of the CBV. A step of your own is a URI of your own domain. Fix: Use a value of the CBV table, in lower case with underscores, such as shipping; name a step of your own with a URI of your own domain."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 128,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "documented",
+            "subject": "event 12"
+          }
+        },
+        {
+          "ruleId": "shipped-before-received",
+          "ruleIndex": 26,
+          "level": "warning",
+          "message": {
+            "text": "Event 14 (ObjectEvent) ships urn:epc:id:sscc:9521234.0000000002 from urn:epc:id:sgln:9521234.00003.0, but its earlier events place it elsewhere, last at urn:epc:id:sgln:9521234.00002.0 in event 13, and never there. This is a best practice of this tool, not a rule in the standards it cites. Fix: Check the readPoint and source of the shipping event and whether an event of the arrival is missing or out of place."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 147,
+                  "startColumn": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 14"
+          }
+        },
+        {
+          "ruleId": "event-out-of-order",
+          "ruleIndex": 23,
+          "level": "warning",
+          "message": {
+            "text": "The recordTime of event 15 (ObjectEvent), 2101-03-04T07:00:00.000+01:00, is 3,600 seconds (1 hour) before its eventTime, 2101-03-04T08:00:00.000+01:00, though an event is recorded after it takes place. This is a best practice of this tool, not a rule in the standards it cites. Fix: Check the clocks of the readers and the order the events were captured in; list the events of an object in the order they took place."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 155,
+                  "startColumn": 9
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 15"
+          }
+        },
+        {
+          "ruleId": "where-missing",
+          "ruleIndex": 17,
+          "level": "warning",
+          "message": {
+            "text": "Event 16 (ObjectEvent) has neither a readPoint nor a bizLocation, so no one can tell where it took place. This is a best practice of this tool, not a rule in the standards it cites. Fix: Add the readPoint where the event was seen, and the bizLocation where the objects are afterwards when they stay there."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 163,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 16"
+          }
+        },
+        {
+          "ruleId": "event-id-missing",
+          "ruleIndex": 22,
+          "level": "note",
+          "message": {
+            "text": "Event 11 (ObjectEvent) has no eventID, so a ledger cannot tell it apart from the same event sent again. This is a best practice of this tool, not a rule in the standards it cites. Fix: Give each event an eventID, such as a UUID URI or the hash ID of the CBV, when the events go to a ledger."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "examples/bad/events.json",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 112,
+                  "startColumn": 7
+                }
+              }
+            }
+          ],
+          "properties": {
+            "kind": "best practice",
+            "subject": "event 11"
+          }
+        }
+      ],
+      "properties": {
+        "notice": "This report is an input to a review of EPCIS events before they are written to a shared supply chain ledger: not a certification of conformance to EPCIS or the CBV, not an audit of the supply chain and not a guarantee that the events describe what really happened.",
+        "result": "FAIL - 21 findings at or above error (21 error, 10 warning, 1 info)",
+        "sources": [
+          "https://ref.gs1.org/standards/epcis/",
+          "https://github.com/gs1/EPCIS/tree/master/JSON-Schema",
+          "https://ref.gs1.org/standards/cbv/",
+          "https://ref.gs1.org/standards/tds/",
+          "https://ref.gs1.org/standards/genspecs/"
+        ]
+      }
+    }
+  ]
+}

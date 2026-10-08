@@ -1,0 +1,61 @@
+epcis-event-check: examples/good/events.json
+file: examples/good/events.json (JSON, 111 lines, 5,263 bytes)
+document: EPCISDocument, schema version 2.0, created 2101-03-10T12:00:00.000Z
+events: 8 (3 ObjectEvent, 2 AggregationEvent, 1 TransactionEvent, 1 TransformationEvent and 1 AssociationEvent)
+identifiers: 5 EPCs, 2 classes and 2 places
+event times: from 2101-03-01T08:00:00.000+01:00 to 2101-03-04T11:00:00.000+01:00
+now: 2101-03-10T12:00:00Z, from --now
+findings: 0
+
+Checks (32)
+
+  check                                level    kind           findings
+  file-unreadable                      error    input          0
+  field-missing                        error    input          0
+  field-unknown                        warning  input          0
+  field-invalid                        error    input          0
+  field-duplicate                      error    input          0
+  secret-in-file                       error    input          0
+  event-type-unknown                   error    documented     0
+  event-time-missing                   error    documented     0
+  event-time-invalid                   error    documented     0
+  timezone-offset-missing              error    documented     0
+  timezone-offset-invalid              error    documented     0
+  action-missing                       error    documented     0
+  action-invalid                       error    documented     0
+  transformation-with-action           error    documented     0
+  what-missing                         error    documented     0
+  transformation-inputs-outputs-empty  error    documented     0
+  quantity-invalid                     error    documented     0
+  where-missing                        warning  best practice  0
+  why-missing                          warning  documented     0
+  biz-step-unknown                     warning  documented     0
+  disposition-unknown                  warning  documented     0
+  event-id-duplicate                   error    documented     0
+  event-id-missing                     info     best practice  0
+  event-out-of-order                   warning  best practice  0
+  future-event                         error    best practice  0
+  object-after-delete                  warning  documented     0
+  shipped-before-received              warning  best practice  0
+  aggregation-child-in-two-parents     warning  best practice  0
+  epc-uri-malformed                    error    documented     0
+  gtin-check-digit-invalid             error    documented     0
+  sscc-check-digit-invalid             error    documented     0
+  gln-check-digit-invalid              error    documented     0
+
+Findings (0)
+
+  none
+
+Event types (5)
+
+  type                 events  ADD  OBSERVE  DELETE  no action
+  ObjectEvent          3       1    2        0       0
+  AggregationEvent     2       1    0        1       0
+  TransactionEvent     1       1    0        0       0
+  TransformationEvent  1       0    0        0       1
+  AssociationEvent     1       1    0        0       0
+
+This report is an input to a review of EPCIS events before they are written to a shared supply chain ledger: not a certification of conformance to EPCIS or the CBV, not an audit of the supply chain and not a guarantee that the events describe what really happened.
+
+RESULT: PASS - no finding at or above error
